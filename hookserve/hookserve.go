@@ -25,6 +25,7 @@ type Event struct {
 	BaseRepo   string // For Pull Requests, contains the base repo
 	BaseBranch string // For Pull Requests, contains the base branch
 	SSHUrl     string // The SSH Url of the repository
+	CloneUrl   string // The url to clone the repository
 }
 
 // Create a new event from a string, the string format being the same as the one produced by event.String()
@@ -221,6 +222,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		event.SSHUrl, err = request.Get("repository").Get("ssh_url").String()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		event.CloneUrl, err = request.Get("repository").Get("clone_url").String()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
